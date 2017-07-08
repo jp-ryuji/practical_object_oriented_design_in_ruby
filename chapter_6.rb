@@ -9,6 +9,7 @@ class Bicycle
     post_initialize(args)
   end
 
+  # Subclass may override
   def post_initialize(args)
     nil
   end
@@ -17,7 +18,12 @@ class Bicycle
     {
       tire_size: tire_size,
       chain: chain,
-    }
+    }.merge(local_spares)
+  end
+
+  # Hook to be overrided by a sub class
+  def local_spares
+    {}
   end
 
   def default_chain
@@ -36,12 +42,14 @@ class RoadBike < Bicycle
     @tape_color = args[:tape_color]
   end
 
-  def spares
-    super.merge(tape_color: tape_color)
-  end
-
   def default_tire_size
     '23'
+  end
+
+  private
+
+  def local_spares
+    { tape_color: tape_color }
   end
 end
 
@@ -53,11 +61,13 @@ class MountainBile < Bicycle
     @rear_shock = args[:rear_shock]
   end
 
-  def spares
-    super.merge(rear_shock: rear_shock)
-  end
-
   def default_tire_size
     '2.1'
+  end
+
+  private
+
+  def local_spares
+    { rear_shock: rear_shock }
   end
 end
