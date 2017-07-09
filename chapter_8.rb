@@ -28,28 +28,23 @@ class Parts
   end
 end
 
-class Part
-  attr_reader :name, :description, :needs_spare
-
-  def initialize(args)
-    @name = args[:name]
-    @description = args[:description]
-    @needs_spare = args.fetch(:needs_spare, true)
-  end
-end
-
 # This factory knows the structure config.
 # Then config can be kept simple.
+require 'ostruct'
 module PartsFactory
-  def self.build(config, part_class = Part, parts_class = Parts)
+  def self.build(config, parts_class = Parts)
     parts_class.new(
       config.collect do |part_config|
-        part_class.new(
-          name: part_config[0],
-          description: part_config[1],
-          needs_spare: part_config.fetch(2,  true)
-        )
+        create_part(part_config)
       end
+    )
+  end
+
+  def self.create_part(part_config)
+    OpenStruct.new(
+      name: part_config[0],
+      description: part_config[1],
+      needs_spare: part_config.fetch(2,  true)
     )
   end
 end
