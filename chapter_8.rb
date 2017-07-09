@@ -12,36 +12,24 @@ class Bicycle
 end
 
 class Parts
-  attr_reader :chain, :tire_size
+  attr_reader :parts
 
-  def initialize(args = {})
-    @size = args[:chain] || default_chain
-    @tire_size = args[:tire_size] || default_tire_size
-    post_initialize(args)
+  def initialize(parts)
+    @parts = parts
   end
 
   def spares
-    {
-      tire_size: tire_size,
-      chain: chain,
-    }.merge(local_spares)
+    parts.select { |part| part.needs_spare }
   end
+end
 
-  def default_tire_size
-    raise NotImplementedError, "This #{self.class} cannnot respond to:"
-  end
+class Part
+  attr_reader :name, :description, :needs_spare
 
-  # Subclass may override
-  def post_initialize(args)
-    nil
-  end
-
-  def local_spares
-    {}
-  end
-
-  def default_chain
-    '10-speed'
+  def initialize(args)
+    @name = args[:name]
+    @description = args[:description]
+    @needs_spare = args.fetch(:needs_spare, true)
   end
 end
 
@@ -78,6 +66,13 @@ class MountainBikeParts < Parts
   end
 end
 
-road_bike = Bicycle.new(size: 'L', parts: RoadBikeParts.new(tape_color: 'read'))
-road_bike.size
-road_bike.spares
+# road_bike = Bicycle.new(size: 'L', parts: RoadBikeParts.new(tape_color: 'read'))
+# road_bike.size
+# road_bike.spares
+#
+
+chain = Part.new(name: 'chain', description: '10-speed')
+road_tire = Part.new(name: 'chain', description: '10-speed')
+front_shock = Part.new(name: 'front_shock', description: 'Manitou', needs_spare: false)
+road_bike_parts = Parts.new([chain, road_tire, tape])
+road_bike = Bicycle.new(size: 'L', parts: road_bike_parts)
